@@ -1,11 +1,15 @@
 import express from 'express';
 import { nanoid } from "nanoid";
+import cors from 'cors';
 
 const app = express();
 
 const inMemoryStorage = {};
 
 app.use(express.json());
+app.use(cors({
+  origin: ['http://localhost:3000']
+}));
 
 app.get('/list/:id', (request, response) => {
   const id = request.params.id;
@@ -26,6 +30,8 @@ app.post('/list', (request, response) => {
   response.json(inMemoryStorage[id]);
 });
 
-app.listen(3000, () => {
-  console.log(`Listening...`)
+const port = 3001;
+
+app.listen(port, () => {
+  console.log(`Listening ${port}...`);
 });

@@ -1,56 +1,57 @@
-import { useState } from "react";
+import { useReducer } from "react";
+import { listCreateReducer } from "./reducers/listCreateReducer";
+
 
 function ListCreate({handleCreate}) {
-  const [listTitle, setListTitle] = useState('');
-  const [newListItemTitle, setListItemTitle] = useState('');
-  const [newListItems, setListItems] = useState([]);
+  const [state, dispatch] = useReducer(listCreateReducer, {
+    listTitle: '',
+    newListItemTitle: '',
+    newListItems: [],
+  });
 
   const onTitleChange = (event) => {
-    setListTitle(event.target.value);
+    dispatch({type: 'setListTitle', payload: event.target.value});
   };
 
   const onItemChange = (event) => {
-    setListItemTitle(event.target.value);
+    dispatch({type: 'setListItemTitle', payload: event.target.value});
   };
 
   const handleAddItem = () => {
-    if (newListItemTitle === '') {
+    if (state.newListItemTitle === '') {
       alert('Item text can not be empty');
       return;
     }
 
-    const updatedList = newListItems.concat([{value: newListItemTitle}]);
-    setListItems(updatedList);
-    setListItemTitle('');
+    dispatch({type: 'setListItems', payload: state.newListItemTitle});
+    dispatch({type: 'setListItemTitle', payload: ''});
   }
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (newListItems.length === 0) {
+    if (state.newListItems.length === 0) {
       alert('At least one todo item must be present');
       return;
     }
 
     handleCreate({
-      title: listTitle,
-      items: newListItems
+      title: state.listTitle,
+      items: state.newListItems
     });
 
-    setListItemTitle('');
-    setListItems([]);
-
-    alert('Todo item created! (see console.log)');
+    dispatch({type: 'setListItemTitle', payload: ''});
+    dispatch({type: 'setListItems', payload: []});
   }
 
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <input value={listTitle} onChange={onTitleChange}></input>
+        <input value={state.listTitle} onChange={onTitleChange}></input>
         <br/>
-        {newListItems.map((item, index) => (<span key={'newListItem' + index}>item {index + 1}: {item.value}</span>))}
+        {state.newListItems.map((item, index) => (<span key={'newListItem' + index}>item {index + 1}: {item.value}</span>))}
         <br/>
-        <input value={newListItemTitle} onChange={onItemChange}></input>
+        <input value={state.newListItemTitle} onChange={onItemChange}></input>
         <span onClick={handleAddItem}>Add list item</span>
         <br/>
         <button type='submit'>Create</button>
